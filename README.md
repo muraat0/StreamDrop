@@ -36,7 +36,10 @@ Modern, hızlı ve kullanıcı dostu bir arayüze sahip; **Flask** ve **yt-dlp**
 ├── ffmpeg.exe              # Medya işleme motoru (yerel dizin)
 └── ffprobe.exe             # Akış analiz motoru (yerel dizin)
 
-🎬 FFmpeg Kurulumu
+
+
+🎬 FFmpeg Kurulumu (Yüksek çözünürlüklü ve boyutlu videolar için tavsiye edilir)
+
 Ses ve görüntünün kayıpsız birleştirilmesi ve MP3 dönüştürme işlemleri için projenin FFmpeg motoruna ihtiyacı vardır. Boyut sınırı nedeniyle bu dosyalar GitHub deposunda yer almaz. Aşağıdaki yöntemi kullanarak kolayca edinebilirsiniz:
 
 Taşınabilir (Portable) Kurulum Adımları
