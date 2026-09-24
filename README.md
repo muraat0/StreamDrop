@@ -36,11 +36,12 @@ Modern, hızlı ve kullanıcı dostu bir arayüze sahip; **Flask** ve **yt-dlp**
 ├── ffmpeg.exe              # Medya işleme motoru (yerel dizin)
 └── ffprobe.exe             # Akış analiz motoru (yerel dizin)
 
-## 🎬 FFmpeg Kurulumu (Önemli)
-
+🎬 FFmpeg Kurulumu
 Ses ve görüntünün kayıpsız birleştirilmesi ve MP3 dönüştürme işlemleri için projenin FFmpeg motoruna ihtiyacı vardır. Boyut sınırı nedeniyle bu dosyalar GitHub deposunda yer almaz. Aşağıdaki yöntemi kullanarak kolayca edinebilirsiniz:
 
-### Taşınabilir (Portable) Kurulum Adımları
-1. **[FFmpeg Release Essentials (.zip)](https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip)** bağlantısına tıklayarak güncel derlemeyi indirin.
-2. İndirilen `.zip` arşivini açın ve içerisindeki `bin` klasörüne girin.
-3. Orada bulunan **`ffmpeg.exe`** ve **`ffprobe.exe`** dosyalarını kopyalayıp doğrudan projenin ana dizinine (`server.py` dosyasının yanına) yapıştırın.
+Taşınabilir (Portable) Kurulum Adımları
+FFmpeg Release Essentials (.zip) bağlantısına tıklayarak güncel derlemeyi indirin.
+
+İndirilen .zip arşivini açın ve içerisindeki bin klasörüne girin.
+
+Orada bulunan ffmpeg.exe ve ffprobe.exe dosyalarını kopyalayıp doğrudan projenin ana dizinine (server.py dosyasının yanına) yapıştırın.
