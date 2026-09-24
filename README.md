@@ -1,4 +1,4 @@
-# 🚀 StreamDrop Web Video & Audio Downloader
+# StreamDrop Web Video & Audio Downloader
 
 Modern, hızlı ve kullanıcı dostu bir arayüze sahip; **Flask** ve **yt-dlp** tabanlı yerel medya indirme aracı. Çeşitli sosyal medya platformlarından video ve ses içeriklerini çözünürlük seçimiyle indirmeyi ve arka planda **FFmpeg** entegrasyonuyla görüntü-ses akışlarını kayıpsız birleştirmeyi sağlar.
 
