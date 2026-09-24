@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamDrop — Evrensel Medya İndirici</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glow-effect {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(110px);
+            opacity: 0.45;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .pulse-slow {
+            animation: pulseGlow 6s ease-in-out infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% { transform: scale(0.95); opacity: 0.35; }
+            100% { transform: scale(1.1); opacity: 0.55; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-between p-4 sm:p-6 relative overflow-x-hidden selection:bg-cyan-500 selection:text-white">
+
+    <div class="glow-effect pulse-slow w-96 h-96 bg-cyan-600 top-[-50px] left-[-80px]"></div>
+    <div class="glow-effect pulse-slow w-96 h-96 bg-indigo-600 bottom-[-50px] right-[-80px]" style="animation-delay: 2s;"></div>
+    <div class="glow-effect pulse-slow w-80 h-80 bg-emerald-600 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-25"></div>
+
+    <header class="w-full max-w-2xl flex items-center justify-between py-4 z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
+                <i class="fa-solid fa-cloud-arrow-down text-white text-lg"></i>
+            </div>
+            <div>
+                <h2 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
+                    StreamDrop
+                    <span class="text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">v2.5 Live</span>
+                </h2>
+                <p class="text-xs text-slate-400">Canlı İlerleme Çubuklu İndirici</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-slate-400 font-medium">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Sunucu Çevrimiçi</span>
+        </div>
+    </header>
+
+    <main class="w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl relative z-10 my-auto">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+                İstediğin Videoyu <br class="hidden sm:inline"/>
+                <span class="bg-gradient-to-r from-cyan-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
+                    Canlı Takip Et & İndir
+                </span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-2 max-w-md mx-auto leading-relaxed">
+                Twitter (X), TikTok, Instagram ve YouTube linklerini yapıştır, anlık hız ve yüzde takibiyle indir.
+            </p>
+        </div>
+
+        <div class="relative group">
+            <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-2xl blur opacity-30 group-hover:opacity-75 transition duration-500"></div>
+            
+            <div class="relative flex flex-col sm:flex-row gap-2 bg-slate-900 border border-slate-700/70 rounded-2xl p-2 shadow-inner">
+                <div class="hidden sm:flex items-center pl-3 text-slate-500">
+                    <i class="fa-solid fa-link"></i>
+                </div>
+
+                <input 
+                    type="text" 
+                    id="urlInput" 
+                    placeholder="Video linkini buraya yapıştırın..." 
+                    class="flex-1 bg-transparent px-3 py-3 text-sm sm:text-base text-slate-100 placeholder-slate-500 focus:outline-none"
+                    autocomplete="off"
+                >
+
+                <div class="flex items-center gap-1 px-1">
+                    <button type="button" onclick="pasteFromClipboard()" title="Panodan Yapıştır" class="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-800/80 rounded-xl transition text-xs flex items-center gap-1">
+                        <i class="fa-regular fa-paste"></i>
+                        <span class="hidden md:inline">Yapıştır</span>
+                    </button>
+                    <button type="button" onclick="clearInput()" id="clearBtn" title="Temizle" class="p-2 text-slate-500 hover:text-rose-400 hover:bg-slate-800/80 rounded-xl transition text-xs hidden">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <button 
+                    onclick="fetchVideo()" 
+                    id="submitBtn" 
+                    class="bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 shadow-md shadow-cyan-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Getir</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="detectedPlatform" class="hidden mt-3 flex items-center gap-2 text-xs font-medium text-slate-400 px-1">
+            <span>Algılanan Platform:</span>
+            <span id="platformBadge" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-slate-200 bg-slate-800 border border-slate-700"></span>
+        </div>
+
+        <div id="loader" class="hidden my-8 flex flex-col items-center justify-center gap-3">
+            <div class="relative w-12 h-12">
+                <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-cyan-400 border-t-transparent animate-spin"></div>
+            </div>
+            <p class="text-sm font-medium text-slate-300 animate-pulse">Video bilgisi analiz ediliyor...</p>
+        </div>
+
+        <div id="downloadProgressBox" class="hidden mt-6 bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-5 shadow-xl flex flex-col gap-3">
+            <div class="flex items-center justify-between text-xs font-semibold">
+                <span id="progressStatusText" class="text-cyan-400 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> İndirme Başlatılıyor...
+                </span>
+                <span id="progressPercentText" class="text-slate-200">0%</span>
+            </div>
+            <div class="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-800">
+                <div id="progressBarFill" class="bg-gradient-to-r from-cyan-500 to-emerald-400 h-full w-0 transition-all duration-200"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400">
+                <span id="progressSpeed">Hız: --</span>
+                <span id="progressEta">Kalan Süre: --</span>
+            </div>
+        </div>
+
+        <div id="resultCard" class="hidden mt-8 transition-all duration-500">
+            <div class="glass-card rounded-2xl p-5 border border-slate-700/60 shadow-xl flex flex-col gap-5">
+                <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                    <div class="relative group/thumb w-full sm:w-44 h-28 rounded-xl overflow-hidden bg-slate-950 flex-shrink-0 border border-slate-800">
+                        <img id="videoThumb" src="" alt="Thumbnail" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <span class="text-[11px] font-bold tracking-wider uppercase text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded-md border border-cyan-800/40">Hazır</span>
+                        <h3 id="videoTitle" class="text-base font-semibold text-slate-100 mt-2 line-clamp-2 leading-snug"></h3>
+                        <p class="text-xs text-slate-400 mt-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-sliders text-slate-500"></i> İndirmek istediğin formatı seç:
+                        </p>
+                    </div>
+                </div>
+                <div class="border-t border-slate-800/80"></div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Mevcut Kaliteler</h4>
+                    <div id="qualityButtons" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-sm font-medium"></div>
+
+    <script>
+        let currentVideoData = null;
+        const urlInput = document.getElementById("urlInput");
+        const clearBtn = document.getElementById("clearBtn");
+        const submitBtn = document.getElementById("submitBtn");
+        const loader = document.getElementById("loader");
+        const resultCard = document.getElementById("resultCard");
+        const downloadProgressBox = document.getElementById("downloadProgressBox");
+        const progressBarFill = document.getElementById("progressBarFill");
+        const progressPercentText = document.getElementById("progressPercentText");
+        const progressStatusText = document.getElementById("progressStatusText");
+        const progressSpeed = document.getElementById("progressSpeed");
+        const progressEta = document.getElementById("progressEta");
+        const detectedPlatform = document.getElementById("detectedPlatform");
+        const platformBadge = document.getElementById("platformBadge");
+
+        urlInput.addEventListener("input", () => {
+            const val = urlInput.value.trim();
+            clearBtn.classList.toggle("hidden", val.length === 0);
+            detectPlatform(val);
+        });
+
+        urlInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") { e.preventDefault(); fetchVideo(); }
+        });
+
+        function clearInput() {
+            urlInput.value = "";
+            clearBtn.classList.add("hidden");
+            detectedPlatform.classList.add("hidden");
+            resultCard.classList.add("hidden");
+            downloadProgressBox.classList.add("hidden");
+            urlInput.focus();
+        }
+
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    urlInput.value = text;
+                    clearBtn.classList.remove("hidden");
+                    detectPlatform(text);
+                    fetchVideo();
+                }
+            } catch (err) { showToast("Panodan okunamadı.", "warning"); }
+        }
+
+        function detectPlatform(url) {
+            if (!url) { detectedPlatform.classList.add("hidden"); return; }
+            let badgeHtml = "";
+            if (url.includes("tiktok.com")) badgeHtml = `<i class="fa-brands fa-tiktok text-rose-400"></i> TikTok`;
+            else if (url.includes("twitter.com") || url.includes("x.com")) badgeHtml = `<i class="fa-brands fa-x-twitter text-slate-200"></i> Twitter (X)`;
+            else if (url.includes("instagram.com")) badgeHtml = `<i class="fa-brands fa-instagram text-pink-400"></i> Instagram`;
+            else if (url.includes("youtube.com") || url.includes("youtu.be")) badgeHtml = `<i class="fa-brands fa-youtube text-red-500"></i> YouTube`;
+
+            if (badgeHtml) { platformBadge.innerHTML = badgeHtml; detectedPlatform.classList.remove("hidden"); }
+            else { detectedPlatform.classList.add("hidden"); }
+        }
+
+        function showToast(message, type = "info") {
+            const toast = document.getElementById("toast");
+            let bgClasses = "bg-slate-900 border border-slate-700 text-slate-100";
+            let icon = "fa-info-circle text-cyan-400";
+            if (type === "success") { bgClasses = "bg-emerald-950/90 border border-emerald-700 text-emerald-100"; icon = "fa-circle-check text-emerald-400"; }
+            else if (type === "error") { bgClasses = "bg-rose-950/90 border border-rose-700 text-rose-100"; icon = "fa-triangle-exclamation text-rose-400"; }
+            else if (type === "warning") { bgClasses = "bg-amber-950/90 border border-amber-700 text-amber-100"; icon = "fa-circle-exclamation text-amber-400"; }
+
+            toast.className = `fixed bottom-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-sm font-medium transition-all duration-300 pointer-events-auto ${bgClasses}`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i> <span>${message}</span>`;
+            toast.classList.remove("translate-y-20", "opacity-0");
+            setTimeout(() => toast.classList.add("translate-y-20", "opacity-0"), 4000);
+        }
+
+        async function fetchVideo() {
+            const url = urlInput.value.trim();
+            if (!url) { showToast("Lütfen bir link girin!", "warning"); urlInput.focus(); return; }
+
+            loader.classList.remove("hidden");
+            resultCard.classList.add("hidden");
+            downloadProgressBox.classList.add("hidden");
+            submitBtn.disabled = true;
+
+            try {
+                const res = await fetch("/api/fetch", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url: url })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Hata oluştu.");
+
+                currentVideoData = { ...data, sourceUrl: url };
+                document.getElementById("videoThumb").src = data.thumbnail || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80";
+                document.getElementById("videoTitle").innerText = data.title;
+
+                const btnContainer = document.getElementById("qualityButtons");
+                btnContainer.innerHTML = "";
+
+                data.qualities.forEach(q => {
+                    const isAudio = q.type === 'audio';
+                    const card = document.createElement("button");
+                    card.className = "group flex items-center justify-between p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 hover:border-cyan-500/50 transition-all text-left active:scale-[0.98]";
+                    card.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg ${isAudio ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'} border flex items-center justify-center text-sm">
+                                <i class="fa-solid ${isAudio ? 'fa-music' : 'fa-film'}"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-slate-200">${q.label}</p>
+                                <p class="text-[10px] text-slate-400">${isAudio ? 'MP3 / Ses' : 'MP4 / Video'}</p>
+                            </div>
+                        </div>
+                        <div class="text-slate-400 group-hover:text-cyan-400 transition pl-2">
+                            <i class="fa-solid fa-arrow-down-to-bracket text-sm"></i>
+                        </div>
+                    `;
+                    card.onclick = () => startLiveDownload(q.format_id, card, q.label);
+                    btnContainer.appendChild(card);
+                });
+
+                resultCard.classList.remove("hidden");
+                showToast("Video formatları listelendi!", "success");
+            } catch (err) {
+                showToast(err.message, "error");
+            } finally {
+                loader.classList.add("hidden");
+                submitBtn.disabled = false;
+            }
+        }
+
+        async function startLiveDownload(formatId, cardElement, label) {
+            document.querySelectorAll("#qualityButtons button").forEach(b => b.classList.add("opacity-50", "pointer-events-none"));
+            
+            downloadProgressBox.classList.remove("hidden");
+            progressBarFill.style.width = "0%";
+            progressPercentText.innerText = "0%";
+            progressStatusText.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${label} hazırlanıyor...`;
+            progressSpeed.innerText = "Hız: Başlatılıyor...";
+            progressEta.innerText = "Kalan Süre: --";
+
+            try {
+                const res = await fetch("/api/start-download", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        url: currentVideoData.sourceUrl,
+                        format_id: formatId,
+                        title: currentVideoData.title
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "İndirme başlatılamadı.");
+
+                const taskId = data.task_id;
+                const eventSource = new EventSource(`/api/progress/${taskId}`);
+
+                eventSource.onmessage = function(event) {
+                    const info = JSON.parse(event.data);
+
+                    if (info.status === "downloading") {
+                        progressBarFill.style.width = info.percent + "%";
+                        progressPercentText.innerText = info.percent + "%";
+                        progressStatusText.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-cyan-400"></i> İndiriliyor...`;
+                        progressSpeed.innerText = "Hız: " + info.speed;
+                        progressEta.innerText = "Kalan Süre: " + info.eta;
+                    } 
+                    else if (info.status === "processing") {
+                        progressBarFill.style.width = "100%";
+                        progressPercentText.innerText = "100%";
+                        progressStatusText.innerHTML = `<i class="fa-solid fa-gears fa-spin text-amber-400"></i> ${info.message}`;
+                        progressSpeed.innerText = "Hız: Tamamlandı";
+                        progressEta.innerText = "Kalan Süre: Neredeyse bitti";
+                    } 
+                    else if (info.status === "completed") {
+                        eventSource.close();
+                        progressBarFill.style.width = "100%";
+                        progressPercentText.innerText = "100%";
+                        progressStatusText.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> İndirme Başarılı! Dosya alınıyor...`;
+                        
+                        window.location.href = `/api/get-file?path=${encodeURIComponent(info.filepath)}`;
+                        showToast("Dosya başarıyla indirildi!", "success");
+
+                        setTimeout(() => {
+                            downloadProgressBox.classList.add("hidden");
+                            document.querySelectorAll("#qualityButtons button").forEach(b => b.classList.remove("opacity-50", "pointer-events-none"));
+                        }, 3000);
+                    } 
+                    else if (info.status === "error") {
+                        eventSource.close();
+                        throw new Error(info.message);
+                    }
+                };
+
+                eventSource.onerror = function() {
+                    eventSource.close();
+                    throw new Error("Bağlantı koptu veya sunucu hatası.");
+                };
+
+            } catch (e) {
+                showToast(e.message, "error");
+                downloadProgressBox.classList.add("hidden");
+                document.querySelectorAll("#qualityButtons button").forEach(b => b.classList.remove("opacity-50", "pointer-events-none"));
+            }
+        }
+    </script>
+</body>
+</html>
